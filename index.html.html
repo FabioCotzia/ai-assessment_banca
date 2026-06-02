@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Assessment</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f5f5f3;color:#1a1a1a;font-size:16px}
+#wrap{max-width:480px;margin:0 auto;padding-bottom:60px}
+.prog{height:4px;background:#e0ddd6}
+.prog-fill{height:4px;background:#1a1a2e;transition:width .3s}
+.screen{display:none}
+.screen.on{display:block}
+.pad{padding:28px 20px 24px}
+.ob-tag{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
+.ob-icon{font-size:34px;color:#1a1a2e;margin-bottom:18px;display:block}
+.ob-title{font-size:21px;font-weight:600;line-height:1.3;margin-bottom:12px}
+.ob-body{font-size:15px;color:#555;line-height:1.7;margin-bottom:20px}
+.ob-examples{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.ob-ex{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:#fff;border:1px solid #e8e4de;border-radius:10px;font-size:13px;color:#555}
+.ob-ex i{font-size:16px;color:#1a1a2e;flex-shrink:0;margin-top:2px}
+.dots{display:flex;gap:6px;justify-content:center;margin-bottom:20px}
+.dot{width:6px;height:6px;border-radius:50%;background:#ccc;display:inline-block}
+.dot.on{background:#1a1a2e;width:18px;border-radius:3px}
+.btn-row{display:flex;gap:10px}
+.btn{display:block;width:100%;padding:15px 20px;background:#1a1a2e;color:#e8e4d0;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;text-align:center;min-height:52px;-webkit-appearance:none;appearance:none;touch-action:manipulation;margin-bottom:0}
+.btn:active{opacity:.75}
+.btn:disabled{opacity:.4;cursor:default}
+.btn-out{background:#fff;color:#1a1a1a;border:1px solid #ccc;flex:1;display:block;width:auto}
+.flabel{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;display:block}
+.ftitle{font-size:19px;font-weight:600;margin-bottom:6px}
+.fsub{font-size:13px;color:#666;line-height:1.6;margin-bottom:14px}
+.note{font-size:12px;color:#888;line-height:1.6;padding:10px 12px;background:#eeeae4;border-radius:8px;margin-bottom:16px}
+.finput{display:block;width:100%;padding:13px 14px;border:1px solid #ccc;border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:#1a1a1a;-webkit-appearance:none;appearance:none;margin-bottom:10px}
+.finput:focus{outline:2px solid #1a1a2e;border-color:#1a1a2e}
+textarea{display:block;width:100%;padding:11px 12px;border:1px solid #ccc;border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:#1a1a1a;resize:vertical;-webkit-appearance:none;appearance:none;min-height:70px}
+textarea:focus{outline:2px solid #1a1a2e;border-color:#1a1a2e}
+.cat{background:#fff;border:1px solid #e8e4de;border-radius:12px;margin-bottom:12px;overflow:hidden}
+.cat-btn{display:block;width:100%;background:#fff;border:none;padding:14px;cursor:pointer;-webkit-appearance:none;appearance:none;touch-action:manipulation;text-align:left;min-height:56px}
+.cat-btn:active{background:#f5f5f3}
+.cat-inner{display:flex;align-items:center;gap:10px}
+.cat-ico{font-size:18px;color:#1a1a2e;flex-shrink:0;width:24px;text-align:center}
+.cat-txt{flex:1;min-width:0}
+.cat-name{font-size:14px;font-weight:600;color:#1a1a1a;display:block}
+.cat-sub{font-size:12px;color:#888;display:block;margin-top:2px}
+.cat-arr{font-size:16px;color:#aaa;flex-shrink:0;transition:transform .2s}
+.cat.open .cat-arr{transform:rotate(180deg)}
+.cat-body{display:none;padding:12px 14px 14px;border-top:1px solid #e8e4de}
+.cat.open .cat-body{display:block}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.chip{display:block;width:100%;padding:10px 10px;border:1px solid #e0ddd6;border-radius:9px;font-size:13px;color:#666;background:#f8f7f5;cursor:pointer;font-family:inherit;-webkit-appearance:none;appearance:none;touch-action:manipulation;min-height:44px;text-align:left}
+.chip:active{opacity:.7}
+.chip.on{background:#1a1a2e;color:#e8e4d0;border-color:#1a1a2e}
+.chip-row{display:flex;align-items:center;gap:6px}
+.chip-chk{font-size:12px;opacity:0;flex-shrink:0;width:14px}
+.chip.on .chip-chk{opacity:1}
+.chip-lbl{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.3}
+.chip-del{display:none;background:rgba(232,228,208,.25);border:1px solid rgba(232,228,208,.4);color:#e8e4d0;border-radius:50%;width:22px;height:22px;font-size:14px;line-height:22px;text-align:center;cursor:pointer;flex-shrink:0;font-family:inherit;-webkit-appearance:none;appearance:none;touch-action:manipulation;padding:0}
+.chip.on.custom .chip-del{display:block}
+.chip-add{border-style:dashed;color:#aaa;background:transparent;text-align:center}
+.add-row{display:flex;gap:8px;margin-top:8px;align-items:center}
+.add-row .finput{flex:1;margin:0}
+.btn-sm{padding:10px 14px;background:#1a1a2e;color:#e8e4d0;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-family:inherit;min-height:44px;-webkit-appearance:none;appearance:none;touch-action:manipulation;white-space:nowrap;flex-shrink:0}
+.fu-wrap{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+.fu-item{padding:11px 12px;background:#f0ede8;border-radius:8px;border-left:2px solid #1a1a2e}
+.fu-name{font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:8px}
+.pill-row{display:flex;flex-wrap:wrap;gap:5px}
+.pill{padding:7px 11px;border:1px solid #ccc;border-radius:20px;font-size:12px;color:#555;background:#fff;cursor:pointer;font-family:inherit;-webkit-appearance:none;appearance:none;touch-action:manipulation;min-height:36px;display:inline-block;line-height:1.3}
+.pill:active{opacity:.7}
+.pill.on{background:#1a1a2e;color:#e8e4d0;border-color:#1a1a2e}
+.pg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.pchip{display:block;width:100%;padding:14px 8px;border:1px solid #e0ddd6;border-radius:10px;font-size:12px;color:#666;background:#f8f7f5;cursor:pointer;font-family:inherit;text-align:center;-webkit-appearance:none;appearance:none;touch-action:manipulation;min-height:76px}
+.pchip:active{opacity:.7}
+.pchip i{font-size:22px;color:#aaa;display:block;margin-bottom:6px}
+.pchip.on{background:#1a1a2e;color:#e8e4d0;border-color:#1a1a2e}
+.pchip.on i{color:#9eb0d8}
+.frow{display:flex;gap:3px;margin-top:6px}
+.fb{flex:1;padding:4px 1px;border:1px solid rgba(232,228,208,.3);border-radius:5px;font-size:10px;color:rgba(232,228,208,.55);background:rgba(232,228,208,.07);cursor:pointer;font-family:inherit;-webkit-appearance:none;appearance:none;touch-action:manipulation;min-height:26px;line-height:1.2}
+.fb.on{background:rgba(232,228,208,.2);color:#e8e4d0;border-color:rgba(232,228,208,.45)}
+.ach{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ac{display:inline-flex;align-items:center;gap:4px;padding:5px 8px 5px 10px;background:#ddeeff;border-radius:14px;font-size:12px;color:#185fa5}
+.ac-del{background:none;border:none;cursor:pointer;font-size:15px;color:#185fa5;line-height:1;padding:0 2px;font-family:inherit;-webkit-appearance:none;touch-action:manipulation}
+.rg{background:#fff;border:1px solid #e8e4de;border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.rg-t{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
+.ri{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid #f0ede8;font-size:13px}
+.ri:last-child{border:none;padding-bottom:0}
+.ri i{font-size:15px;color:#1a1a2e;margin-top:1px;flex-shrink:0}
+.ri-t{flex:1;color:#1a1a1a;line-height:1.4}
+.ri-s{font-size:11px;color:#888;margin-top:2px}
+.re{font-size:13px;color:#aaa;font-style:italic}
+.ok-icon{font-size:56px;color:#0F6E56;display:block;text-align:center;margin-bottom:16px}
+.ok-title{font-size:22px;font-weight:600;text-align:center;margin-bottom:10px}
+.ok-sub{font-size:14px;color:#666;line-height:1.7;text-align:center}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid #e0ddd6;border-top-color:#1a1a2e;border-radius:50%;animation:sp .8s linear infinite;vertical-align:-3px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.smsg{text-align:center;font-size:13px;color:#888;padding:8px 0;min-height:32px}
+.smsg.err{color:#a32d2d}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div class="prog"><div class="prog-fill" id="pg" style="width:5%"></div></div>
+
+  <!-- S0 -->
+  <div id="s0" class="screen on">
+    <div class="pad">
+      <div class="ob-tag">AI Risk Assessment · Banca</div>
+      <i class="ti ti-shield-check ob-icon"></i>
+      <div class="ob-title">Perché ti chiediamo questo</div>
+      <div class="ob-body">Dal 2025 è in vigore il <strong>Regolamento europeo sull'Intelligenza Artificiale (AI Act)</strong>. Come banca, siamo tenuti a censire tutti i sistemi di IA in uso — sia quelli aziendali, sia quelli usati autonomamente dai dipendenti.<br><br>Questo questionario è riservato e richiede <strong>meno di 5 minuti</strong>.</div>
+      <div class="dots"><span class="dot on"></span><span class="dot"></span><span class="dot"></span></div>
+      <button class="btn" id="b-s0-next">Avanti →</button>
+    </div>
+  </div>
+
+  <!-- S1 -->
+  <div id="s1" class="screen">
+    <div class="pad">
+      <div class="ob-tag">Cos'è l'intelligenza artificiale</div>
+      <i class="ti ti-brain ob-icon"></i>
+      <div class="ob-title">L'IA non è solo fantascienza</div>
+      <div class="ob-body">Un sistema di IA è qualsiasi software che <strong>analizza dati e prende decisioni o suggerisce azioni</strong> in modo automatico.
+        <div class="ob-examples">
+          <div class="ob-ex"><i class="ti ti-trending-up"></i><span>Il sistema AML che segnala automaticamente operazioni sospette</span></div>
+          <div class="ob-ex"><i class="ti ti-mail"></i><span>Il filtro antispam che blocca le email di phishing</span></div>
+          <div class="ob-ex"><i class="ti ti-message-chatbot"></i><span>ChatGPT o Copilot per scrivere email o riassumere documenti</span></div>
+          <div class="ob-ex"><i class="ti ti-users"></i><span>Il sistema HR che suggerisce candidati o valuta performance</span></div>
+          <div class="ob-ex"><i class="ti ti-file-search"></i><span>Il software che legge e classifica automaticamente contratti</span></div>
+        </div>
+      </div>
+      <div class="dots"><span class="dot"></span><span class="dot on"></span><span class="dot"></span></div>
+      <div class="btn-row">
+        <button class="btn btn-out" id="b-s1-back">← Indietro</button>
+        <button class="btn" id="b-s1-next">Avanti →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- S2 -->
+  <div id="s2" class="screen">
+    <div class="pad">
+      <div class="ob-tag">Cosa ti chiediamo</div>
+      <i class="ti ti-list-check ob-icon"></i>
+      <div class="ob-title">Solo due cose</div>
+      <div class="ob-body">
+        <div class="ob-examples">
+          <div class="ob-ex"><i class="ti ti-building-bank"></i><span><strong>Sistemi della banca</strong> — quali strumenti informatici usi nel lavoro che sembrano "intelligenti" o automatici?</span></div>
+          <div class="ob-ex"><i class="ti ti-device-mobile"></i><span><strong>Strumenti personali</strong> — usi ChatGPT, Gemini, Copilot o simili per attività lavorative, anche con account personale?</span></div>
+        </div>
+        <br>
+        <div class="note">Le risposte sono riservate. Non ci interessa sanzionare nessuno: vogliamo capire la realtà per costruire policy utili a tutti.</div>
+      </div>
+      <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot on"></span></div>
+      <div class="btn-row">
+        <button class="btn btn-out" id="b-s2-back">← Indietro</button>
+        <button class="btn" id="b-s2-next">Inizia →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- S3 -->
+  <div id="s3" class="screen">
+    <div class="pad">
+      <span class="flabel">Passo 1 di 4</span>
+      <div class="ftitle">Chi sei</div>
+      <div class="fsub">Tre campi rapidi, poi via.</div>
+      <input class="finput" type="text" id="f_name" placeholder="Nome e cognome" autocomplete="name">
+      <input class="finput" type="text" id="f_dept" placeholder="Funzione / Dipartimento (es. Compliance, IT)">
+      <input class="finput" type="text" id="f_role" placeholder="Ruolo (es. Analista, Responsabile)">
+      <div class="note">I dati identificativi servono solo per abbinare le risposte alla funzione. Non saranno usati per valutazioni individuali.</div>
+      <button class="btn" id="b-s3-next">Avanti →</button>
+    </div>
+  </div>
+
+  <!-- S4 -->
+  <div id="s4" class="screen">
+    <div class="pad">
+      <span class="flabel">Passo 2 di 4</span>
+      <div class="ftitle">Sistemi della banca con IA</div>
+      <div class="fsub">Tocca una categoria per espanderla. Seleziona i sistemi che usi. Usa + per aggiungere software non in lista.</div>
+      <div id="cats"></div>
+      <button class="btn" id="b-s4-next">Avanti →</button>
+    </div>
+  </div>
+
+  <!-- S5 -->
+  <div id="s5" class="screen">
+    <div class="pad">
+      <span class="flabel">Passo 3 di 4</span>
+      <div class="ftitle">Strumenti IA personali</div>
+      <div class="fsub">Usi questi strumenti — anche con account personale — per attività lavorative?</div>
+      <div class="pg" id="pgrid"></div>
+      <div class="fsub" style="margin-bottom:6px">Altri strumenti non in lista:</div>
+      <div class="add-row">
+        <input class="finput" type="text" id="padd" placeholder="Es. Perplexity, Grok…">
+        <button class="btn-sm" id="b-padd">+</button>
+      </div>
+      <div class="ach" id="pach"></div>
+      <div style="margin-top:18px">
+        <button class="btn" id="b-s5-next">Avanti →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- S6 -->
+  <div id="s6" class="screen">
+    <div class="pad">
+      <span class="flabel">Passo 4 di 4 · Riepilogo</span>
+      <div class="ftitle">Controlla le tue risposte</div>
+      <div id="rev"></div>
+      <label style="font-size:13px;color:#666;display:block;margin-bottom:6px;margin-top:4px">Note aggiuntive (facoltativo)</label>
+      <textarea id="f_notes" placeholder="Qualcosa che non hai trovato nella lista…"></textarea>
+      <div style="margin-top:16px">
+        <div class="smsg" id="smsg"></div>
+        <button class="btn" id="b-send">Invia le risposte ✓</button>
+        <div style="margin-top:10px">
+          <button class="btn btn-out" id="b-s6-back" style="width:100%">← Modifica</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S7 -->
+  <div id="s7" class="screen">
+    <div class="pad" style="padding-top:60px;text-align:center">
+      <i class="ti ti-circle-check ok-icon"></i>
+      <div class="ok-title">Grazie per la tua collaborazione</div>
+      <div class="ok-sub">Le tue risposte sono state registrate. Il team di compliance le utilizzerà esclusivamente per il progetto AI Act.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var SHEET = 'https://script.google.com/macros/s/AKfycbx1isTsHCxsmatzXx_XfaLFYEoYj5zhv1oMdmN0w4Z_C5f3hPzqBugMdATHWuS5UubNXA/exec';
+
+var PROG = {s0:5,s1:15,s2:25,s3:38,s4:56,s5:75,s6:90,s7:100};
+
+var CATS = [
+  {id:'aml', ico:'ti-trending-up', name:'AML / Antiriciclaggio', sub:'Monitoraggio transazioni, screening sanzioni, KYC', items:['FICO TONBELLER','NICE Actimize','Oracle FCCM','Refinitiv World-Check','ComplyAdvantage','SAS AML'], fu:true},
+  {id:'cyber', ico:'ti-shield', name:'Cybersecurity', sub:'Antivirus, firewall, email security, SIEM', items:['CrowdStrike Falcon','SentinelOne','Microsoft Defender','Proofpoint','Mimecast','Splunk','Darktrace'], fu:true},
+  {id:'credit', ico:'ti-credit-card', name:'Scoring creditizio / Rating', sub:'Valutazione fidi, scoring clienti, modelli di rischio', items:["Moody's Analytics",'CRIF','Experian PowerCurve','FICO Score','S&P RiskGauge','Modello interno ML'], fu:true},
+  {id:'doc', ico:'ti-file-search', name:'Gestione documentale', sub:'OCR, lettura automatica contratti, IDP', items:['ABBYY FlexiCapture','Hyperscience','Rossum','Azure Doc Intelligence','Kofax'], fu:true},
+  {id:'prod', ico:'ti-apps', name:'Produttività e assistenti AI', sub:'Copilot, assistenti email, riunioni, redazione', items:['Microsoft 365 Copilot','GitHub Copilot','Zoom AI Companion','Teams Copilot','Otter.ai','Notion AI'], fu:false},
+  {id:'hr', ico:'ti-users', name:'HR e gestione personale', sub:'Selezione, performance, workforce analytics', items:['SAP SuccessFactors AI','Workday AI','LinkedIn Recruiter AI','HireVue','Beamery'], fu:true},
+  {id:'crm', ico:'ti-building-store', name:'CRM / Sales / Marketing', sub:'Scoring clienti, next best action, chatbot', items:['Salesforce Einstein','HubSpot AI','Dynamics 365 AI','Adobe Sensei','Medallia AI'], fu:true},
+  {id:'rep', ico:'ti-chart-bar', name:'Reportistica e analytics', sub:'Power BI AI, Tableau, previsioni', items:['Power BI (funzioni AI)','Tableau AI','Qlik Sense AI','MicroStrategy AI','ThoughtSpot'], fu:false}
+];
+
+var PERS = [
+  {id:'chatgpt', ico:'ti-message-chatbot', name:'ChatGPT'},
+  {id:'gemini',  ico:'ti-sparkles',        name:'Gemini'},
+  {id:'copilot', ico:'ti-brand-windows',   name:'Copilot'},
+  {id:'claude',  ico:'ti-robot',           name:'Claude'},
+  {id:'perp',    ico:'ti-search',          name:'Perplexity'},
+  {id:'deepl',   ico:'ti-language',        name:'DeepL'},
+  {id:'midj',    ico:'ti-photo-ai',        name:'Midjourney'},
+  {id:'otter',   ico:'ti-microphone',      name:'Otter/Fireflies'}
+];
+
+var DOPTS = ["Solo il sistema decide","L'operatore segue il suggerimento","L'operatore decide autonomamente","Non so"];
+
+var cSel={}, cCust={}, cDec={}, pSel={}, pCust=[];
+
+function go(id) {
+  var screens = document.querySelectorAll('.screen');
+  for (var i=0;i<screens.length;i++) screens[i].classList.remove('on');
+  document.getElementById(id).classList.add('on');
+  document.getElementById('pg').style.width = (PROG[id]||50) + '%';
+  if (id==='s4') buildCats();
+  if (id==='s5') buildPers();
+  if (id==='s6') buildRev();
+  window.scrollTo(0,0);
+}
+
+function tap(id, fn) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('touchend', function(e){ e.preventDefault(); fn(); });
+  el.addEventListener('click', fn);
+}
+
+function q(id){ return document.getElementById(id); }
+
+function getCSel(cid) {
+  var a = [];
+  var m = cSel[cid] || {};
+  var keys = Object.keys(m);
+  for (var i=0;i<keys.length;i++) { if (m[keys[i]]) a.push(keys[i]); }
+  var cc = cCust[cid] || [];
+  for (var j=0;j<cc.length;j++) a.push(cc[j]);
+  return a;
+}
+
+/* NAV */
+tap('b-s0-next', function(){ go('s1'); });
+tap('b-s1-back', function(){ go('s0'); });
+tap('b-s1-next', function(){ go('s2'); });
+tap('b-s2-back', function(){ go('s1'); });
+tap('b-s2-next', function(){ go('s3'); });
+tap('b-s3-next', function(){ go('s4'); });
+tap('b-s4-next', function(){ go('s5'); });
+tap('b-s5-next', function(){ go('s6'); });
+tap('b-s6-back', function(){ go('s5'); });
+tap('b-padd',    function(){ addPC(); });
+tap('b-send',    function(){ send(); });
+
+/* CATS */
+function buildCats() {
+  var html = '';
+  for (var i=0;i<CATS.length;i++) {
+    var c = CATS[i];
+    html += '<div class="cat" id="cb-'+c.id+'">'
+      + '<button class="cat-btn" id="catbtn-'+c.id+'">'
+      + '<div class="cat-inner">'
+      + '<i class="ti '+c.ico+' cat-ico"></i>'
+      + '<span class="cat-txt"><span class="cat-name">'+c.name+'</span><span class="cat-sub">'+c.sub+'</span></span>'
+      + '<i class="ti ti-chevron-down cat-arr" id="carr-'+c.id+'"></i>'
+      + '</div></button>'
+      + '<div class="cat-body">'
+      + '<div class="grid" id="gr-'+c.id+'"></div>'
+      + '<div id="ai-'+c.id+'"></div>'
+      + '<div id="fu-'+c.id+'"></div>'
+      + '</div></div>';
+  }
+  q('cats').innerHTML = html;
+  for (var j=0;j<CATS.length;j++) {
+    (function(cat){
+      tap('catbtn-'+cat.id, function(){ toggleCat(cat.id); });
+      renderGrid(cat.id);
+      renderFu(cat.id);
+    })(CATS[j]);
+  }
+}
+
+function toggleCat(cid) {
+  var b = q('cb-'+cid);
+  if (b) b.classList.toggle('open');
+}
+
+function renderGrid(cid) {
+  var cat = null;
+  for (var i=0;i<CATS.length;i++) { if (CATS[i].id===cid) { cat=CATS[i]; break; } }
+  var g = q('gr-'+cid);
+  if (!g || !cat) return;
+  var html = '';
+  for (var i=0;i<cat.items.length;i++) {
+    var item = cat.items[i];
+    var s = !!(cSel[cid] && cSel[cid][item]);
+    var sid = 'chip-'+cid+'-'+i;
+    html += '<button class="chip'+(s?' on':'')+'" id="'+sid+'" data-cid="'+cid+'" data-item="'+encodeURIComponent(item)+'">'
+      +'<div class="chip-row"><i class="ti ti-check chip-chk"></i><span class="chip-lbl">'+item+'</span></div>'
+      +'</button>';
+  }
+  var cc = cCust[cid] || [];
+  for (var j=0;j<cc.length;j++) {
+    var citem = cc[j];
+    var csid = 'cchip-'+cid+'-'+j;
+    html += '<button class="chip on custom" id="'+csid+'">'
+      +'<div class="chip-row"><i class="ti ti-check chip-chk" style="opacity:1"></i>'
+      +'<span class="chip-lbl">'+citem+'</span>'
+      +'<button class="chip-del" id="cdel-'+cid+'-'+j+'">×</button>'
+      +'</div></button>';
+  }
+  html += '<button class="chip chip-add" id="chadd-'+cid+'">'
+    +'<div class="chip-row" style="justify-content:center"><i class="ti ti-plus"></i><span class="chip-lbl">Aggiungi</span></div>'
+    +'</button>';
+  g.innerHTML = html;
+
+  for (var k=0;k<cat.items.length;k++) {
+    (function(item, sid){
+      tap(sid, function(){
+        if (!cSel[cid]) cSel[cid]={};
+        cSel[cid][item] = !cSel[cid][item];
+        renderGrid(cid); renderFu(cid);
+      });
+    })(cat.items[k], 'chip-'+cid+'-'+k);
+  }
+  for (var m=0;m<cc.length;m++) {
+    (function(idx){
+      var delid = 'cdel-'+cid+'-'+idx;
+      var el = q(delid);
+      if (!el) return;
+      el.addEventListener('touchend', function(e){ e.stopPropagation(); e.preventDefault(); remCust(cid,idx); });
+      el.addEventListener('click',    function(e){ e.stopPropagation(); remCust(cid,idx); });
+    })(m);
+  }
+  tap('chadd-'+cid, function(){ showAdd(cid); });
+}
+
+function remCust(cid, idx) {
+  if (!cCust[cid]) return;
+  var item = cCust[cid][idx];
+  cCust[cid].splice(idx,1);
+  if (cDec[cid] && item) delete cDec[cid][item];
+  renderGrid(cid); renderFu(cid);
+}
+
+function showAdd(cid) {
+  var el = q('ai-'+cid);
+  if (!el || el.querySelector('input')) return;
+  var iid = 'ci-'+cid;
+  var bid = 'cok-'+cid;
+  el.innerHTML = '<div class="add-row"><input class="finput" type="text" id="'+iid+'" placeholder="Nome del sistema…"><button class="btn-sm" id="'+bid+'">+</button></div>';
+  tap(bid, function(){
+    var inp = q(iid);
+    var val = inp ? inp.value.trim() : '';
+    if (!val) return;
+    if (!cCust[cid]) cCust[cid]=[];
+    var exists = false;
+    for (var x=0;x<cCust[cid].length;x++) { if (cCust[cid][x]===val) { exists=true; break; } }
+    if (!exists) cCust[cid].push(val);
+    el.innerHTML = '';
+    renderGrid(cid); renderFu(cid);
+    var blk = q('cb-'+cid);
+    if (blk) blk.classList.add('open');
+  });
+  setTimeout(function(){ var i=q(iid); if(i) i.focus(); }, 100);
+}
+
+function renderFu(cid) {
+  var cat = null;
+  for (var i=0;i<CATS.length;i++) { if (CATS[i].id===cid) { cat=CATS[i]; break; } }
+  var el = q('fu-'+cid);
+  if (!el || !cat) return;
+  var all = getCSel(cid);
+  if (!cat.fu || !all.length) { el.innerHTML=''; return; }
+  var html = '<div class="fu-wrap">';
+  for (var i=0;i<all.length;i++) {
+    var sw = all[i];
+    var cur = (cDec[cid]||{})[sw] || '';
+    html += '<div class="fu-item"><div class="fu-name">'+sw+'</div><div class="pill-row">';
+    for (var j=0;j<DOPTS.length;j++) {
+      var o = DOPTS[j];
+      var pid = 'pill-'+cid+'-'+i+'-'+j;
+      html += '<button class="pill'+(cur===o?' on':'')+'" id="'+pid+'" data-cid="'+cid+'" data-sw="'+encodeURIComponent(sw)+'" data-opt="'+encodeURIComponent(o)+'">'+o+'</button>';
+    }
+    html += '</div></div>';
+  }
+  html += '</div>';
+  el.innerHTML = html;
+  for (var i=0;i<all.length;i++) {
+    for (var j=0;j<DOPTS.length;j++) {
+      (function(sw, opt, pid){
+        var el2 = q(pid);
+        if (!el2) return;
+        el2.addEventListener('touchend', function(e){ e.preventDefault(); setDec(cid,sw,opt); });
+        el2.addEventListener('click',    function(){  setDec(cid,sw,opt); });
+      })(all[i], DOPTS[j], 'pill-'+cid+'-'+i+'-'+j);
+    }
+  }
+}
+
+function setDec(cid, sw, val) {
+  if (!cDec[cid]) cDec[cid]={};
+  cDec[cid][sw] = val;
+  renderFu(cid);
+}
+
+/* PERSONAL */
+function buildPers() {
+  var html = '';
+  for (var i=0;i<PERS.length;i++) {
+    var t = PERS[i];
+    var st = pSel[t.id];
+    var s = !!st;
+    var fr = '';
+    if (s) {
+      fr = '<div class="frow">';
+      var freqs = ['Raramente','Spesso','Ogni giorno'];
+      for (var j=0;j<freqs.length;j++) {
+        var f = freqs[j];
+        var fid = 'fb-'+t.id+'-'+j;
+        fr += '<button class="fb'+(st.freq===f?' on':'')+'" id="'+fid+'" data-tid="'+t.id+'" data-freq="'+f+'">'+f+'</button>';
+      }
+      fr += '</div>';
+    }
+    html += '<button class="pchip'+(s?' on':'')+'" id="pc-'+t.id+'">'
+      +'<i class="ti '+t.ico+'"></i>'+t.name+fr+'</button>';
+  }
+  q('pgrid').innerHTML = html;
+
+  for (var i=0;i<PERS.length;i++) {
+    (function(t){
+      var el = q('pc-'+t.id);
+      if (!el) return;
+      el.addEventListener('touchend', function(e){ e.preventDefault(); togP(t.id); });
+      el.addEventListener('click',    function(){ togP(t.id); });
+      if (pSel[t.id]) {
+        var freqs = ['Raramente','Spesso','Ogni giorno'];
+        for (var j=0;j<freqs.length;j++) {
+          (function(f, fid){
+            var fb = q(fid);
+            if (!fb) return;
+            fb.addEventListener('touchend', function(e){ e.stopPropagation(); e.preventDefault(); setFr(t.id, f); });
+            fb.addEventListener('click',    function(e){ e.stopPropagation(); setFr(t.id, f); });
+          })(freqs[j], 'fb-'+t.id+'-'+j);
+        }
+      }
+    })(PERS[i]);
+  }
+  renderPAch();
+}
+
+function togP(id) {
+  if (pSel[id]) delete pSel[id]; else pSel[id]={freq:''};
+  buildPers();
+}
+
+function setFr(id, freq) {
+  if (pSel[id]) pSel[id].freq = freq;
+  var freqs = ['Raramente','Spesso','Ogni giorno'];
+  for (var j=0;j<freqs.length;j++) {
+    var fb = q('fb-'+id+'-'+j);
+    if (fb) fb.classList.toggle('on', freqs[j]===freq);
+  }
+}
+
+function addPC() {
+  var inp = q('padd');
+  var val = inp ? inp.value.trim() : '';
+  if (!val) return;
+  var exists = false;
+  for (var i=0;i<pCust.length;i++) { if (pCust[i]===val) { exists=true; break; } }
+  if (!exists) pCust.push(val);
+  inp.value = '';
+  renderPAch();
+}
+
+function renderPAch() {
+  var el = q('pach');
+  if (!el) return;
+  var html = '';
+  for (var i=0;i<pCust.length;i++) {
+    var pid = 'pacdel-'+i;
+    html += '<span class="ac"><i class="ti ti-check" style="font-size:11px"></i>'+pCust[i]
+      +'<button class="ac-del" id="'+pid+'">×</button></span>';
+  }
+  el.innerHTML = html;
+  for (var i=0;i<pCust.length;i++) {
+    (function(idx){
+      var el2 = q('pacdel-'+idx);
+      if (!el2) return;
+      el2.addEventListener('touchend', function(e){ e.preventDefault(); pCust.splice(idx,1); renderPAch(); });
+      el2.addEventListener('click',    function(){ pCust.splice(idx,1); renderPAch(); });
+    })(i);
+  }
+}
+
+/* REVIEW */
+function buildRev() {
+  var name = q('f_name').value||'—';
+  var dept = q('f_dept').value||'—';
+  var role = q('f_role').value||'—';
+  var intI = [];
+  for (var i=0;i<CATS.length;i++) {
+    var sel = getCSel(CATS[i].id);
+    for (var j=0;j<sel.length;j++) {
+      intI.push({cat:CATS[i].name, sw:sel[j], dec:(cDec[CATS[i].id]||{})[sel[j]]||''});
+    }
+  }
+  var pI = [];
+  for (var i=0;i<PERS.length;i++) {
+    if (pSel[PERS[i].id]) pI.push({name:PERS[i].name, freq:pSel[PERS[i].id].freq||'—'});
+  }
+  for (var i=0;i<pCust.length;i++) pI.push({name:pCust[i], freq:'—'});
+
+  var html = '<div class="rg"><div class="rg-t">Chi sei</div>'
+    +'<div class="ri"><i class="ti ti-user"></i><div class="ri-t">'+name+'<div class="ri-s">'+role+' · '+dept+'</div></div></div></div>'
+    +'<div class="rg"><div class="rg-t">Sistemi della banca ('+intI.length+')</div>';
+  if (intI.length) {
+    for (var i=0;i<intI.length;i++) {
+      html += '<div class="ri"><i class="ti ti-building-bank"></i><div class="ri-t">'+intI[i].sw+'<div class="ri-s">'+intI[i].cat+(intI[i].dec?' · '+intI[i].dec:'')+'</div></div></div>';
+    }
+  } else { html += '<div class="re">Nessun sistema selezionato</div>'; }
+  html += '</div><div class="rg"><div class="rg-t">Strumenti personali ('+pI.length+')</div>';
+  if (pI.length) {
+    for (var i=0;i<pI.length;i++) {
+      html += '<div class="ri"><i class="ti ti-device-mobile"></i><div class="ri-t">'+pI[i].name+'<div class="ri-s">Frequenza: '+pI[i].freq+'</div></div></div>';
+    }
+  } else { html += '<div class="re">Nessuno strumento selezionato</div>'; }
+  html += '</div>';
+  q('rev').innerHTML = html;
+}
+
+/* SUBMIT */
+function send() {
+  var intI = [];
+  for (var i=0;i<CATS.length;i++) {
+    var sel = getCSel(CATS[i].id);
+    for (var j=0;j<sel.length;j++) {
+      intI.push({categoria:CATS[i].name, sistema:sel[j], chi_decide:(cDec[CATS[i].id]||{})[sel[j]]||''});
+    }
+  }
+  var pI = [];
+  for (var i=0;i<PERS.length;i++) {
+    if (pSel[PERS[i].id]) pI.push({strumento:PERS[i].name, frequenza:pSel[PERS[i].id].freq||''});
+  }
+  for (var i=0;i<pCust.length;i++) pI.push({strumento:pCust[i], frequenza:''});
+  var payload = {
+    timestamp: new Date().toISOString(),
+    nome:      q('f_name').value||'',
+    funzione:  q('f_dept').value||'',
+    ruolo:     q('f_role').value||'',
+    sistemi_banca: intI,
+    strumenti_personali: pI,
+    note: q('f_notes').value||''
+  };
+  var btn = q('b-send');
+  var msg = q('smsg');
+  btn.disabled = true;
+  msg.className = 'smsg';
+  msg.innerHTML = '<span class="spin"></span>Invio in corso…';
+  fetch(SHEET, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  }).then(function(){
+    msg.innerHTML = '';
+    go('s7');
+  }).catch(function(){
+    msg.className = 'smsg err';
+    msg.innerHTML = 'Errore di rete. Riprova.';
+    btn.disabled = false;
+  });
+}
+</script>
+</body>
+</html>
